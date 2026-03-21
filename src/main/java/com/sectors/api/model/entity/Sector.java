@@ -17,6 +17,7 @@ import lombok.Setter;
 public class Sector {
     @Id
     private Long id;
-    private String name;
     private Long parentId;
+    private int displayOrder;
+    private String name;
 }

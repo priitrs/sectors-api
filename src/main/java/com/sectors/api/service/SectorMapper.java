@@ -17,7 +17,7 @@ public class SectorMapper {
         List<SectorDto> roots = new ArrayList<>();
 
         for (Sector s : sectors) {
-            sectorDtoMap.put(s.getId(), new SectorDto(s.getId(), s.getName(), new ArrayList<>()));
+            sectorDtoMap.put(s.getId(), new SectorDto(s.getId(), s.getDisplayOrder(), s.getName(), new ArrayList<>()));
         }
 
         for (Sector s : sectors) {
@@ -40,7 +40,7 @@ public class SectorMapper {
     }
 
     private static void sortRecursively(List<SectorDto> sectors) {
-        sectors.sort(Comparator.comparing(SectorDto::id));
+        sectors.sort(Comparator.comparing(SectorDto::displayOrder));
         for (SectorDto s : sectors) {
             sortRecursively(s.children());
         }
