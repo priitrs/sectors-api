@@ -5,11 +5,13 @@ services:
     environment:
       POSTGRES_USER: sectors
       POSTGRES_PASSWORD: pass
+      TZ: UTC
+      PGTZ: UTC
     ports:
       - "5400:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-    command: ["postgres", "-c", "log_statement=ddl"]
+    command: ["postgres", "-c", "log_statement=ddl", "-c", "timezone=UTC"]
 
 volumes:
   db_data:

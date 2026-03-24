@@ -3,11 +3,10 @@
 --changeset priitrs:sectors
 CREATE TABLE IF NOT EXISTS sectors
 (
-    id            BIGINT PRIMARY KEY,
-    parent_id     BIGINT DEFAULT NULL,
+    id            BIGINT       NOT NULL PRIMARY KEY,
+    parent_id     BIGINT       DEFAULT NULL REFERENCES sectors (id),
     display_order INTEGER      NOT NULL,
-    name          VARCHAR(255) NOT NULL,
-    FOREIGN KEY (parent_id) REFERENCES sectors (id)
+    name          VARCHAR(255) NOT NULL
 );
 
 INSERT INTO sectors (id, parent_id, display_order, name)

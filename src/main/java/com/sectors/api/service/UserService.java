@@ -28,7 +28,6 @@ public class UserService {
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setPassword(encoder.encode(userRequest.getPassword()));
-        user.setAcceptTerms(false);
         userRepository.save(user);
     }
 

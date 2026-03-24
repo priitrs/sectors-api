@@ -15,6 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Sector {
+
     @Id
     private Long id;
     private Long parentId;
