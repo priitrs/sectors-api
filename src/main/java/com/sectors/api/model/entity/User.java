@@ -20,5 +20,8 @@ public class User {
     @UuidGenerator
     private UUID id;
     private String username;
+    private String firstName;
+    private String lastName;
     private String password;
+    private boolean acceptTerms;
 }

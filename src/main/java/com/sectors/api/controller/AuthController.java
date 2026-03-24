@@ -30,7 +30,10 @@ public class AuthController {
     public void register(@RequestBody UserDto userDto) {
         User user = new User();
         user.setUsername(userDto.getUsername());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
         user.setPassword(encoder.encode(userDto.getPassword()));
+        user.setAcceptTerms(false);
         userRepository.save(user);
     }
 
