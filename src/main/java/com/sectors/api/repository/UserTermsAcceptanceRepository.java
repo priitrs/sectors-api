@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserTermsAcceptanceRepository extends JpaRepository<UserTermsAcceptance, UUID> {
-Optional<UserTermsAcceptance> findUserTermsAcceptanceByUserIdOrderByCreatedAtDesc(UUID userId);
+Optional<UserTermsAcceptance> findFirstByUserIdOrderByCreatedAtDesc(UUID userId);
 }

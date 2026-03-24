@@ -25,14 +25,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public void register(@RequestBody UserRequest userRequest) {
-        userService.register(userRequest);
+        userService.registerNew(userRequest);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+    public ResponseEntity<?> me(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.ok(Map.of("username", authentication.getName()));
+        return ResponseEntity.ok(Map.of("username", auth.getName()));
     }
 }

@@ -23,13 +23,13 @@ public class UserSettingsController {
 
     @Operation(summary = "Get user settings")
     @GetMapping()
-    public UserSettingsDto getUserSettings(Authentication authentication) {
-        return userService.getUserSettings(authentication.getName());
+    public UserSettingsDto getUserSettings(Authentication auth) {
+        return userService.getSettings(auth.getName());
     }
 
     @Operation(summary = "Set user settings")
     @PostMapping()
-    public UserSettingsDto saveUserSettings(@RequestBody UserSettingsDto userSettingsDto, Authentication authentication) {
-        return userService.saveUserSettings(authentication.getName(), userSettingsDto);
+    public UserSettingsDto saveUserSettings(@RequestBody UserSettingsDto userSettingsDto, Authentication auth) {
+        return userService.saveSettings(auth.getName(), userSettingsDto);
     }
 }

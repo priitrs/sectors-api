@@ -12,9 +12,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class UserService {
     private final UserTermsAcceptanceRepository userTermsAcceptanceRepository;
     private final PasswordEncoder encoder;
 
-    public void register(UserRequest userRequest) {
+    public void registerNew(UserRequest userRequest) {
         //TODO: validate user input
         User user = new User();
         user.setUsername(userRequest.getUsername());
@@ -35,36 +36,54 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserSettingsDto getUserSettings(String username) {
+    public UserSettingsDto getSettings(String username) {
         User user = getUser(username);
 
         List<Long> userSectors = userSectorRepository.findByUserId(user.getId()).stream()
                 .map(UserSector::getSectorId)
                 .toList();
 
-        Optional<UserTermsAcceptance> termsAcceptance = userTermsAcceptanceRepository.findUserTermsAcceptanceByUserIdOrderByCreatedAtDesc(user.getId());
-        Boolean isAcceptTerms = termsAcceptance.map(UserTermsAcceptance::isAcceptTerms).orElse(false);
+        Boolean isAcceptTerms = userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId())
+                .map(UserTermsAcceptance::isAcceptTerms)
+                .orElse(false);
 
         return new UserSettingsDto(user.getFirstName(), user.getLastName(), userSectors, isAcceptTerms);
     }
 
-    public UserSettingsDto saveUserSettings(String username, UserSettingsDto userSettingsDto) {
+    @Transactional
+    public UserSettingsDto saveSettings(String username, UserSettingsDto userSettingsDto) {
         //TODO: validate user input
         User user = getUser(username);
+
+        handleUserNameChanges(user, userSettingsDto);
+        handleSectorSelectionChanges(user.getId(), userSettingsDto.getSelectedSectors());
+        handleAcceptTermsChanges(user.getId(), userSettingsDto.isAcceptTerms());
+
+        return getSettings(username);
+    }
+
+    private void handleUserNameChanges(User user, UserSettingsDto userSettingsDto) {
         user.setFirstName(userSettingsDto.getFirstName());
         user.setLastName(userSettingsDto.getLastName());
         userRepository.save(user);
+    }
 
-        userSectorRepository.deleteByUserId(user.getId());
-        userSettingsDto.getSelectedSectors().forEach(sectorId -> {
+    private void handleAcceptTermsChanges(UUID userId, boolean acceptTerms) {
+        UserTermsAcceptance userTermsAcceptance = new UserTermsAcceptance();
+        userTermsAcceptance.setUserId(userId);
+        userTermsAcceptance.setAcceptTerms(acceptTerms);
+        userTermsAcceptanceRepository.save(userTermsAcceptance);
+    }
+
+    private void handleSectorSelectionChanges(UUID userId, List<Long> selectedSectors) {
+        userSectorRepository.deleteAllByUserId(userId);
+
+        selectedSectors.forEach(sectorId -> {
             UserSector userSector = new UserSector();
-            userSector.setUserId(user.getId());
+            userSector.setUserId(userId);
             userSector.setSectorId(sectorId);
             userSectorRepository.save(userSector);
         });
-
-
-        return getUserSettings(username);
     }
 
     private User getUser(String username) {

@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface UserSectorRepository extends JpaRepository<UserSector, UUID> {
     List<UserSector> findByUserId(UUID userId);
 
-    void deleteByUserId(UUID id);
+    void deleteAllByUserId(UUID userId);
 }
