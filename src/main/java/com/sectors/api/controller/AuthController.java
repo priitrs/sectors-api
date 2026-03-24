@@ -1,14 +1,12 @@
 package com.sectors.api.controller;
 
-import com.sectors.api.model.dto.UserDto;
-import com.sectors.api.model.entity.User;
-import com.sectors.api.repository.UserRepository;
+import com.sectors.api.model.dto.UserRequest;
+import com.sectors.api.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,18 +21,11 @@ import java.util.Map;
 @RestController
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder encoder;
+    private final UserService userService;
 
     @PostMapping("/register")
-    public void register(@RequestBody UserDto userDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setPassword(encoder.encode(userDto.getPassword()));
-        user.setAcceptTerms(false);
-        userRepository.save(user);
+    public void register(@RequestBody UserRequest userRequest) {
+        userService.register(userRequest);
     }
 
     @GetMapping("/me")

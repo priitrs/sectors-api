@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class UserDto {
+public class UserRequest {
     private String username;
     private String firstName;
     private String lastName;
