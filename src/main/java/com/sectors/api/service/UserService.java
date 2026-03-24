@@ -2,7 +2,6 @@ package com.sectors.api.service;
 
 import com.sectors.api.model.dto.UserRequest;
 import com.sectors.api.model.dto.UserSettingsDto;
-import com.sectors.api.model.entity.Sector;
 import com.sectors.api.model.entity.User;
 import com.sectors.api.model.entity.UserSector;
 import com.sectors.api.repository.UserRepository;
@@ -23,6 +22,7 @@ public class UserService {
     private final PasswordEncoder encoder;
 
     public void register(UserRequest userRequest) {
+        //TODO: validate user input
         User user = new User();
         user.setUsername(userRequest.getUsername());
         user.setFirstName(userRequest.getFirstName());
@@ -38,5 +38,29 @@ public class UserService {
                 .toList();
 
         return new UserSettingsDto(user.getFirstName(), user.getLastName(), userSectors, false);
+    }
+
+    public UserSettingsDto saveUserSettings(String username, UserSettingsDto userSettingsDto) {
+        //TODO: validate user input
+        User user = getUser(username);
+        user.setFirstName(userSettingsDto.getFirstName());
+        user.setLastName(userSettingsDto.getLastName());
+        userRepository.save(user);
+
+        userSectorRepository.deleteByUserId(user.getId());
+        userSettingsDto.getSelectedSectors().forEach(sectorId -> {
+            UserSector userSector = new UserSector();
+            userSector.setUserId(user.getId());
+            userSector.setSectorId(sectorId);
+            userSectorRepository.save(userSector);
+        });
+
+
+        return getUserSettings(username);
+    }
+
+    private User getUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
