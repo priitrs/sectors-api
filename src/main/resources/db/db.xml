@@ -6,5 +6,6 @@
 
     <include file="/db/sectors.sql"/>
     <include file="/db/users.sql"/>
+    <include file="/db/user_sectors.sql"/>
 
 </databaseChangeLog>

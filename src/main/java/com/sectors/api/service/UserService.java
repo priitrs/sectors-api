@@ -2,8 +2,11 @@ package com.sectors.api.service;
 
 import com.sectors.api.model.dto.UserRequest;
 import com.sectors.api.model.dto.UserSettingsDto;
+import com.sectors.api.model.entity.Sector;
 import com.sectors.api.model.entity.User;
+import com.sectors.api.model.entity.UserSector;
 import com.sectors.api.repository.UserRepository;
+import com.sectors.api.repository.UserSectorRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +19,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserSectorRepository userSectorRepository;
     private final PasswordEncoder encoder;
 
     public void register(UserRequest userRequest) {
@@ -29,9 +33,11 @@ public class UserService {
     }
 
     public UserSettingsDto getUserSettings(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = getUser(username);
+        List<Long> userSectors = userSectorRepository.findByUserId(user.getId()).stream()
+                .map(UserSector::getSectorId)
+                .toList();
 
-        return new UserSettingsDto(user.getFirstName(), user.getLastName(), List.of(), user.isAcceptTerms());
+        return new UserSettingsDto(user.getFirstName(), user.getLastName(), userSectors, false);
     }
 }
