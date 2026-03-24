@@ -4,14 +4,17 @@ import com.sectors.api.model.dto.UserRequest;
 import com.sectors.api.model.dto.UserSettingsDto;
 import com.sectors.api.model.entity.User;
 import com.sectors.api.model.entity.UserSector;
+import com.sectors.api.model.entity.UserTermsAcceptance;
 import com.sectors.api.repository.UserRepository;
 import com.sectors.api.repository.UserSectorRepository;
+import com.sectors.api.repository.UserTermsAcceptanceRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -19,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserSectorRepository userSectorRepository;
+    private final UserTermsAcceptanceRepository userTermsAcceptanceRepository;
     private final PasswordEncoder encoder;
 
     public void register(UserRequest userRequest) {
@@ -33,11 +37,15 @@ public class UserService {
 
     public UserSettingsDto getUserSettings(String username) {
         User user = getUser(username);
+
         List<Long> userSectors = userSectorRepository.findByUserId(user.getId()).stream()
                 .map(UserSector::getSectorId)
                 .toList();
 
-        return new UserSettingsDto(user.getFirstName(), user.getLastName(), userSectors, false);
+        Optional<UserTermsAcceptance> termsAcceptance = userTermsAcceptanceRepository.findUserTermsAcceptanceByUserIdOrderByCreatedAtDesc(user.getId());
+        Boolean isAcceptTerms = termsAcceptance.map(UserTermsAcceptance::isAcceptTerms).orElse(false);
+
+        return new UserSettingsDto(user.getFirstName(), user.getLastName(), userSectors, isAcceptTerms);
     }
 
     public UserSettingsDto saveUserSettings(String username, UserSettingsDto userSettingsDto) {

@@ -7,5 +7,6 @@
     <include file="/db/sectors.sql"/>
     <include file="/db/users.sql"/>
     <include file="/db/user_sectors.sql"/>
+    <include file="/db/user_terms_acceptance.sql"/>
 
 </databaseChangeLog>
