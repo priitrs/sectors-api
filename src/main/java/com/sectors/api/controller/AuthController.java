@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+
 @Tag(name = "Auth", description = "Auth operations")
-@AllArgsConstructor
-@RequestMapping("/api/auth")
 @RestController
+@RequestMapping("/api/auth")
+@AllArgsConstructor
 public class AuthController {
 
     private final UserService userService;
