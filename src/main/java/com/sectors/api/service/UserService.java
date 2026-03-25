@@ -45,7 +45,9 @@ public class UserService {
         User user = getUser(username);
 
         List<Long> userSectors = userSectorRepository.findByUserId(user.getId()).stream()
+                .filter(UserSector::isActive)
                 .map(UserSector::getSectorId)
+                .distinct()
                 .toList();
 
         boolean isAcceptTerms = userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId())
