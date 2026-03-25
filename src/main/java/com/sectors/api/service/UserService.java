@@ -74,12 +74,13 @@ public class UserService {
     }
 
     private void handleSectorSelectionChanges(UUID userId, List<Long> selectedSectors) {
-        userSectorRepository.deleteAllByUserId(userId);
+        userSectorRepository.deactivateAllActiveByUserId(userId);
 
         selectedSectors.forEach(sectorId -> {
             UserSector userSector = new UserSector();
             userSector.setUserId(userId);
             userSector.setSectorId(sectorId);
+            userSector.setActive(true);
             userSectorRepository.save(userSector);
         });
     }

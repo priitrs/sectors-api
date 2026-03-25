@@ -24,6 +24,9 @@ public class UserSector {
     private UUID id;
     private UUID userId;
     private Long sectorId;
+    private boolean isActive;
     @Column(insertable = false, updatable = false)
     private Instant createdAt;
+    @Column(insertable = false, updatable = false)
+    private Instant updatedAt;
 }
