@@ -4,7 +4,10 @@ import com.sectors.api.model.dto.UserSettingsDto;
 import com.sectors.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +32,8 @@ public class UserSettingsController {
 
     @Operation(summary = "Set user settings")
     @PostMapping()
-    public void saveUserSettings(@RequestBody UserSettingsDto userSettingsDto, Authentication auth) {
+    public ResponseEntity<Void> saveUserSettings(@Valid @RequestBody UserSettingsDto userSettingsDto, Authentication auth) {
         userService.saveSettings(auth.getName(), userSettingsDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

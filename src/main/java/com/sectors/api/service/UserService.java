@@ -46,7 +46,7 @@ public class UserService {
                 .map(UserSector::getSectorId)
                 .toList();
 
-        Boolean isAcceptTerms = userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId())
+        boolean isAcceptTerms = userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(user.getId())
                 .map(UserTermsAcceptance::isAcceptTerms)
                 .orElse(false);
 
@@ -55,7 +55,6 @@ public class UserService {
 
     @Transactional
     public void saveSettings(String username, UserSettingsDto userSettingsDto) {
-        //TODO: validate user input
         User user = getUser(username);
 
         handleUserNameChanges(user, userSettingsDto);
@@ -64,28 +63,31 @@ public class UserService {
     }
 
     private void handleUserNameChanges(User user, UserSettingsDto userSettingsDto) {
-        user.setFirstName(userSettingsDto.getFirstName());
-        user.setLastName(userSettingsDto.getLastName());
+        user.setFirstName(sanitizeName(userSettingsDto.getFirstName()));
+        user.setLastName(sanitizeName(userSettingsDto.getLastName()));
         userRepository.save(user);
-    }
-
-    private void handleAcceptTermsChanges(UUID userId, boolean acceptTerms) {
-        UserTermsAcceptance userTermsAcceptance = new UserTermsAcceptance();
-        userTermsAcceptance.setUserId(userId);
-        userTermsAcceptance.setAcceptTerms(acceptTerms);
-        userTermsAcceptanceRepository.save(userTermsAcceptance);
     }
 
     private void handleSectorSelectionChanges(UUID userId, List<Long> selectedSectors) {
         userSectorRepository.deactivateAllActiveByUserId(userId);
 
-        selectedSectors.forEach(sectorId -> {
-            UserSector userSector = new UserSector();
-            userSector.setUserId(userId);
-            userSector.setSectorId(sectorId);
-            userSector.setActive(true);
-            userSectorRepository.save(userSector);
-        });
+        selectedSectors.stream()
+                .distinct()
+                .sorted()
+                .forEach(sectorId -> {
+                    UserSector userSector = new UserSector();
+                    userSector.setUserId(userId);
+                    userSector.setSectorId(sectorId);
+                    userSector.setActive(true);
+                    userSectorRepository.save(userSector);
+                });
+    }
+
+    private void handleAcceptTermsChanges(UUID userId, boolean isAcceptTerms) {
+        UserTermsAcceptance userTermsAcceptance = new UserTermsAcceptance();
+        userTermsAcceptance.setUserId(userId);
+        userTermsAcceptance.setAcceptTerms(isAcceptTerms);
+        userTermsAcceptanceRepository.save(userTermsAcceptance);
     }
 
     private User getUser(String username) {
