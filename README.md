@@ -7,4 +7,4 @@
 
 ### Swagger:
 
-http://localhost:8000/swagger-ui/index.html#/
+https://localhost:8000/swagger-ui/index.html#/

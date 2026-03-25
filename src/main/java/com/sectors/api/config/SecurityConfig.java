@@ -28,6 +28,13 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .redirectToHttps(redirect -> {})
+                .headers(headers -> headers
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)
+                        )
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AUTH_REGISTER, AUTH_LOGIN, AUTH_ME).permitAll()
                         .anyRequest().authenticated()
