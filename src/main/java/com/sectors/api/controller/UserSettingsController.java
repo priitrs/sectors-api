@@ -29,7 +29,7 @@ public class UserSettingsController {
 
     @Operation(summary = "Set user settings")
     @PostMapping()
-    public UserSettingsDto saveUserSettings(@RequestBody UserSettingsDto userSettingsDto, Authentication auth) {
-        return userService.saveSettings(auth.getName(), userSettingsDto);
+    public void saveUserSettings(@RequestBody UserSettingsDto userSettingsDto, Authentication auth) {
+        userService.saveSettings(auth.getName(), userSettingsDto);
     }
 }

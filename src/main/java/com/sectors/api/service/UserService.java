@@ -51,15 +51,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserSettingsDto saveSettings(String username, UserSettingsDto userSettingsDto) {
+    public void saveSettings(String username, UserSettingsDto userSettingsDto) {
         //TODO: validate user input
         User user = getUser(username);
 
         handleUserNameChanges(user, userSettingsDto);
         handleSectorSelectionChanges(user.getId(), userSettingsDto.getSelectedSectors());
         handleAcceptTermsChanges(user.getId(), userSettingsDto.isAcceptTerms());
-
-        return getSettings(username);
     }
 
     private void handleUserNameChanges(User user, UserSettingsDto userSettingsDto) {
