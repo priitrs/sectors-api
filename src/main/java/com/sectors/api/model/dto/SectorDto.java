@@ -3,9 +3,9 @@ package com.sectors.api.model.dto;
 import java.util.List;
 
 public record SectorDto (
-    Long id,
+    Long value,
     int displayOrder,
-    String name,
+    String title,
     List<SectorDto> children
 ) {
 }

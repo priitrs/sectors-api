@@ -23,17 +23,17 @@ class SectorMapperTest {
         List<SectorDto> result = SectorMapper.buildSectorTree(sectors);
 
         assertEquals(2, result.size());
-        assertEquals(6L, result.get(0).id());
-        assertEquals(2L, result.get(1).id());
+        assertEquals(6L, result.get(0).value());
+        assertEquals(2L, result.get(1).value());
 
         List<SectorDto> root1Children = result.get(0).children();
         assertEquals(2, root1Children.size());
-        assertEquals(3L, root1Children.get(0).id());
-        assertEquals(4L, root1Children.get(1).id());
+        assertEquals(3L, root1Children.get(0).value());
+        assertEquals(4L, root1Children.get(1).value());
 
         List<SectorDto> child1Children = root1Children.get(0).children();
         assertEquals(1, child1Children.size());
-        assertEquals(5L, child1Children.getFirst().id());
+        assertEquals(5L, child1Children.getFirst().value());
 
         assertTrue(result.get(1).children().isEmpty());
     }
@@ -54,7 +54,7 @@ class SectorMapperTest {
         List<SectorDto> result = SectorMapper.buildSectorTree(List.of(root));
 
         assertEquals(1, result.size());
-        assertEquals(1L, result.getFirst().id());
+        assertEquals(1L, result.getFirst().value());
         assertTrue(result.getFirst().children().isEmpty());
     }
 
@@ -65,7 +65,7 @@ class SectorMapperTest {
         List<SectorDto> result = SectorMapper.buildSectorTree(List.of(child));
 
         assertEquals(1, result.size());
-        assertEquals(2L, result.getFirst().id());
+        assertEquals(2L, result.getFirst().value());
         assertTrue(result.getFirst().children().isEmpty());
     }
 
@@ -76,7 +76,7 @@ class SectorMapperTest {
         List<SectorDto> result = SectorMapper.buildSectorTree(List.of(selfParent));
 
         assertEquals(1, result.size());
-        assertEquals(1L, result.getFirst().id());
+        assertEquals(1L, result.getFirst().value());
         assertTrue(result.getFirst().children().isEmpty());
     }
 }
