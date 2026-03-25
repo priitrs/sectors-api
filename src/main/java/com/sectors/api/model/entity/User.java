@@ -28,4 +28,6 @@ public class User {
     private String password;
     @Column(insertable = false, updatable = false)
     private Instant createdAt;
+    @Column(insertable = false, updatable = false)
+    private Instant updatedAt;
 }

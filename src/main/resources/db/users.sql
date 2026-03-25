@@ -8,5 +8,21 @@ CREATE TABLE IF NOT EXISTS users
     first_name    VARCHAR(255) NOT NULL,
     last_name     VARCHAR(255) NOT NULL,
     password      VARCHAR(255) NOT NULL,
-    created_at    TIMESTAMP    NOT NULL DEFAULT now()
+    created_at    TIMESTAMP    NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMP    NOT NULL DEFAULT now()
 );
+
+--changeset priitrs:users-updated-at-trigger splitStatements:false
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+--changeset priitrs:users-updated-at-trigger-create
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
