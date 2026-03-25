@@ -27,11 +27,14 @@ public class UserService {
     private final PasswordEncoder encoder;
 
     public void registerNew(UserRequest userRequest) {
-        //TODO: validate user input
+        if (userRepository.findByUsername(userRequest.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already taken");
+        }
+
         User user = new User();
-        user.setUsername(userRequest.getUsername());
-        user.setFirstName(userRequest.getFirstName());
-        user.setLastName(userRequest.getLastName());
+        user.setUsername(userRequest.getUsername().trim().toLowerCase());
+        user.setFirstName(sanitizeName(userRequest.getFirstName()));
+        user.setLastName(sanitizeName(userRequest.getLastName()));
         user.setPassword(encoder.encode(userRequest.getPassword()));
         userRepository.save(user);
     }
@@ -88,5 +91,9 @@ public class UserService {
     private User getUser(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    private String sanitizeName(String name) {
+        return name.trim().replaceAll("\\s+", " ");
     }
 }

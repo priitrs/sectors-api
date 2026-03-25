@@ -3,6 +3,7 @@ package com.sectors.api.controller;
 import com.sectors.api.model.dto.UserRequest;
 import com.sectors.api.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,9 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public void register(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<Void> register(@Valid @RequestBody UserRequest userRequest) {
         userService.registerNew(userRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/me")
