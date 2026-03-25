@@ -14,8 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -96,6 +98,16 @@ public class UserService {
     }
 
     private String sanitizeName(String name) {
-        return name.trim().replaceAll("\\s+", " ");
+        if (name == null) return null;
+        return Arrays.stream(name.trim().replaceAll("\\s+", " ").split(" "))
+                .map(word -> Arrays.stream(word.split("-", -1))
+                        .map(this::capitalizeFirst)
+                        .collect(Collectors.joining("-")))
+                .collect(Collectors.joining(" "));
+    }
+
+    private String capitalizeFirst(String s) {
+        if (s.isEmpty()) return s;
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase();
     }
 }
