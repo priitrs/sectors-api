@@ -22,4 +22,7 @@ public final class ValidationConstants {
     public static final String PASSWORD_REQUIRED = "Password is required";
     public static final String PASSWORD_SIZE = "Password must be between {min} and {max} characters";
     public static final String PASSWORD_INVALID = "Password must contain uppercase, lowercase, digit and special character (@$!%*?&)";
+
+    public static final String SECTORS_CANNOT_BE_NULL = "Sectors must be provided";
+    public static final String SECTORS_CANNOT_BE_EMPTY = "At least one sector must be selected";
 }

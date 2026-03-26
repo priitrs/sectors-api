@@ -1,6 +1,8 @@
 package com.sectors.api.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -28,6 +30,9 @@ public class UserSettingsDto {
     @Pattern(regexp = NAME_PATTERN, message = LAST_NAME_INVALID)
     private String lastName;
 
+    @NotNull(message = SECTORS_CANNOT_BE_NULL)
+    @NotEmpty(message = SECTORS_CANNOT_BE_EMPTY)
     private List<Long> selectedSectors;
+
     private boolean acceptTerms;
 }
