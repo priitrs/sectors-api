@@ -176,22 +176,40 @@ class UserServiceTest {
     @Test
     void saveSettings_updatesFirstAndLastName() {
         UserSettingsDto dto = new UserSettingsDto("  alice  ", "  smith  ", List.of(1L), true);
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        UserSector activeSector = buildUserSector(testUserId, 1L, true);
+        UserTermsAcceptance terms = new UserTermsAcceptance();
+        terms.setUserId(testUserId);
+        terms.setAcceptTerms(true);
 
-        userService.saveSettings(testUser.getUsername(), dto);
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userSectorRepository.findByUserId(testUserId)).thenReturn(List.of(activeSector));
+        when(userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(testUserId))
+                .thenReturn(Optional.of(terms));
+
+        UserSettingsDto result = userService.saveSettings(testUser.getUsername(), dto);
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(captor.capture());
         assertEquals("Alice", captor.getValue().getFirstName());
         assertEquals("Smith", captor.getValue().getLastName());
+        assertNotNull(result);
+        assertEquals("Alice", result.getFirstName());
+        assertEquals("Smith", result.getLastName());
     }
 
     @Test
     void saveSettings_deactivatesOldSectorsAndSavesNew() {
         UserSettingsDto dto = new UserSettingsDto("Alice", "Smith", List.of(3L, 1L, 2L), false);
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        UserSector s1 = buildUserSector(testUserId, 1L, true);
+        UserSector s2 = buildUserSector(testUserId, 2L, true);
+        UserSector s3 = buildUserSector(testUserId, 3L, true);
 
-        userService.saveSettings(testUser.getUsername(), dto);
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userSectorRepository.findByUserId(testUserId)).thenReturn(List.of(s1, s2, s3));
+        when(userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(testUserId))
+                .thenReturn(Optional.empty());
+
+        UserSettingsDto result = userService.saveSettings(testUser.getUsername(), dto);
 
         verify(userSectorRepository).deactivateAllActiveByUserId(testUserId);
 
@@ -199,12 +217,19 @@ class UserServiceTest {
         verify(userSectorRepository, times(3)).save(captor.capture());
         List<Long> savedIds = captor.getAllValues().stream().map(UserSector::getSectorId).toList();
         assertEquals(List.of(1L, 2L, 3L), savedIds);
+        assertNotNull(result);
     }
 
     @Test
     void saveSettings_deduplicatesSectorsBeforeSaving() {
         UserSettingsDto dto = new UserSettingsDto("Alice", "Smith", List.of(1L, 1L, 2L), false);
+        UserSector s1 = buildUserSector(testUserId, 1L, true);
+        UserSector s2 = buildUserSector(testUserId, 2L, true);
+
         when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userSectorRepository.findByUserId(testUserId)).thenReturn(List.of(s1, s2));
+        when(userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(testUserId))
+                .thenReturn(Optional.empty());
 
         userService.saveSettings(testUser.getUsername(), dto);
 
@@ -214,14 +239,46 @@ class UserServiceTest {
     @Test
     void saveSettings_savesTermsAcceptance() {
         UserSettingsDto dto = new UserSettingsDto("Alice", "Smith", List.of(), true);
-        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        UserTermsAcceptance terms = new UserTermsAcceptance();
+        terms.setUserId(testUserId);
+        terms.setAcceptTerms(true);
 
-        userService.saveSettings(testUser.getUsername(), dto);
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userSectorRepository.findByUserId(testUserId)).thenReturn(List.of());
+        when(userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(testUserId))
+                .thenReturn(Optional.of(terms));
+
+        UserSettingsDto result = userService.saveSettings(testUser.getUsername(), dto);
 
         ArgumentCaptor<UserTermsAcceptance> captor = ArgumentCaptor.forClass(UserTermsAcceptance.class);
         verify(userTermsAcceptanceRepository).save(captor.capture());
         assertEquals(testUserId, captor.getValue().getUserId());
         assertTrue(captor.getValue().isAcceptTerms());
+        assertNotNull(result);
+        assertTrue(result.isAcceptTerms());
+    }
+
+    @Test
+    void saveSettings_returnsUpdatedSettings() {
+        UserSettingsDto dto = new UserSettingsDto("Alice", "Smith", List.of(1L, 2L), true);
+        UserSector s1 = buildUserSector(testUserId, 1L, true);
+        UserSector s2 = buildUserSector(testUserId, 2L, true);
+        UserTermsAcceptance terms = new UserTermsAcceptance();
+        terms.setUserId(testUserId);
+        terms.setAcceptTerms(true);
+
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(Optional.of(testUser));
+        when(userSectorRepository.findByUserId(testUserId)).thenReturn(List.of(s1, s2));
+        when(userTermsAcceptanceRepository.findFirstByUserIdOrderByCreatedAtDesc(testUserId))
+                .thenReturn(Optional.of(terms));
+
+        UserSettingsDto result = userService.saveSettings(testUser.getUsername(), dto);
+
+        assertNotNull(result);
+        assertEquals("Alice", result.getFirstName());
+        assertEquals("Smith", result.getLastName());
+        assertEquals(List.of(1L, 2L), result.getSelectedSectors());
+        assertTrue(result.isAcceptTerms());
     }
 
     @Test

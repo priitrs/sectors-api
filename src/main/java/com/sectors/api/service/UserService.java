@@ -58,9 +58,13 @@ public class UserService {
     }
 
     @Transactional
-    public void saveSettings(String username, UserSettingsDto userSettingsDto) {
+    public UserSettingsDto saveSettings(String username, UserSettingsDto userSettingsDto) {
         User user = getUser(username);
+        handleChanges(userSettingsDto, user);
+        return getSettings(username);
+    }
 
+    private void handleChanges(UserSettingsDto userSettingsDto, User user) {
         handleUserNameChanges(user, userSettingsDto);
         handleSectorSelectionChanges(user.getId(), userSettingsDto.getSelectedSectors());
         handleAcceptTermsChanges(user.getId(), userSettingsDto.isAcceptTerms());
